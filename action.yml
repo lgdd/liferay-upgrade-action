@@ -1,0 +1,135 @@
+name: "Liferay Upgrade Action"
+description: "Create a new branch and pull request if a new Liferay version is available"
+inputs:
+  java-version:
+    description: "Java version (default: '11'). Check Liferay compatibility matrix: https://www.liferay.com/compatibility-matrix."
+    required: true
+    default: "11"
+  java-distribution:
+    description: "Java distribution (default: 'zulu'). Check Liferay compatibility matrix: https://www.liferay.com/compatibility-matrix. List of supported distributions for the setup-java action: https://github.com/actions/setup-java#supported-distributions"
+    required: true
+    default: "zulu"
+  workspace-directory:
+    description: "Path to your workspace if different from root directory."
+    required: false
+    default: .
+
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Get Current Liferay Update
+      shell: bash
+      working-directory: ${{ env.WORKING_DIRECTORY }}
+      run: |
+        echo "LFR_CURRENT_PRODUCT_NAME=$(cat gradle.properties | grep liferay.workspace.product= | cut -d '=' -f2)" >> $GITHUB_ENV
+    - name: Fetch Latest Liferay Update
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const { LFR_CURRENT_PRODUCT_NAME } = process.env;
+          const productSplit = LFR_CURRENT_PRODUCT_NAME.split('-');
+          const currentEdition = productSplit[0]
+          const currentVersion = productSplit[1].replaceAll('.', '')
+          const liferayProductInfoUrl =
+            `https://github.com/lgdd/liferay-product-info/raw/main/${currentEdition}_${currentVersion}_product_info.json`;
+
+          fetch(liferayProductInfoUrl, { method: 'Get' })
+            .then((res) => res.json())
+            .then((json) => {
+              const latestProduct = json[json.length - 1];
+              const upgradeBranchName = latestProduct.name.replaceAll('.', '');
+              core.exportVariable('LFR_LATEST_PRODUCT_NAME', latestProduct.name);
+              core.exportVariable('LFR_LATEST_PRODUCT_VERSION_NAME', latestProduct.liferayProductVersion);
+              core.exportVariable('UPGRADE_BRANCH_NAME', `upgrade-to-${latestProduct.name.replaceAll('.', '')}`);
+            });
+    - name: Check If Upgrade Needed
+      shell: bash
+      id: check-upgrade
+      run: |
+        if [ "${{ env.LFR_LATEST_PRODUCT_NAME }}" = "${{ env.LFR_CURRENT_PRODUCT_NAME }}" ]; then
+          echo "Already on the latest version: ${{ env.LFR_LATEST_PRODUCT_NAME }}"
+          echo "status=skip" >> $GITHUB_OUTPUT
+        else
+          echo "Run upgrade from ${{ env.LFR_CURRENT_PRODUCT_NAME }} to ${{ env.LFR_LATEST_PRODUCT_NAME }}"
+          echo "status=upgrade" >> $GITHUB_OUTPUT
+        fi;
+    - name: Check Upgrade Branch
+      shell: bash
+      id: check-branch
+      if: steps.check-upgrade.outputs.status == 'upgrade'
+      run: |
+        NO_UPGRADE_BRANCH=$(git ls-remote -q | grep -q '${{ env.UPGRADE_BRANCH_NAME }}' && echo false || echo true)
+        echo "NO_UPGRADE_BRANCH=$NO_UPGRADE_BRANCH" >> $GITHUB_ENV
+        if [ $NO_UPGRADE_BRANCH ]; then
+          echo "Upgrade branch ${{ env.UPGRADE_BRANCH_NAME }} doesn't exist."
+          echo "status=upgrade" >> $GITHUB_OUTPUT
+        else
+          echo "Upgrade branch ${{ env.UPGRADE_BRANCH_NAME }} already exists."
+          echo "status=skip" >> $GITHUB_OUTPUT
+        fi;
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      if: steps.check-branch.outputs.status == 'upgrade'
+      with:
+        distribution: ${{ env.JAVA_DISTRIBUTION || 'zulu' }}
+        java-version: ${{ env.JAVA_VERSION || 11 }}
+    - name: Cache Gradle Packages
+      uses: actions/cache@v3
+      if: steps.check-branch.outputs.status == 'upgrade'
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    - name: Build Workspace
+      shell: bash
+      if: steps.check-branch.outputs.status == 'upgrade'
+      id: build-workspace
+      working-directory: ${{ env.WORKING_DIRECTORY }}
+      run: |
+        sed -i -e 's/${{ env.LFR_CURRENT_PRODUCT_NAME }}/${{ env.LFR_LATEST_PRODUCT_NAME }}/g' gradle.properties
+        ./gradlew
+        ./gradlew build -S > gradle-out.txt 2> gradle-err.txt
+        cat gradle-out.txt >> gradle-build.txt
+        cat gradle-err.txt >> gradle-build.txt
+        if [ -s gradle-err.txt ]; then
+            cat gradle-err.txt
+            rm gradle-err.txt
+            rm gradle-out.txt
+            exit 1
+        else
+            cat gradle-out.txt
+            rm gradle-err.txt
+            rm gradle-out.txt
+            exit 0
+        fi;
+    - name: Create Branch & Commit Changes
+      shell: bash
+      if: always() && steps.check-branch.outputs.status == 'upgrade'
+      working-directory: ${{ env.WORKING_DIRECTORY }}
+      run: |
+        git config user.name github-actions[bot]
+        git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+        git checkout -b ${{ env.UPGRADE_BRANCH_NAME }}
+        git add --all -- ':!gradle-build.txt'
+        git commit -m "chore: upgrade to ${{ env.LFR_LATEST_PRODUCT_NAME }}"
+        git push -u origin ${{ env.UPGRADE_BRANCH_NAME }}
+    - name: Create Pull Request
+      shell: bash
+      if: steps.check-branch.outputs.status == 'upgrade'
+      working-directory: ${{ env.WORKING_DIRECTORY }}
+      run: |
+        echo "Build output:" >> pr-body.md
+        echo "\`\`\`" >> pr-body.md
+        cat gradle-build.txt >> pr-body.md
+        echo "\`\`\`" >> pr-body.md
+        gh pr create \
+          --assignee "${{ github.repository_owner }}" \
+          --base "${{ env.GITHUB_REF_NAME }}" \
+          --head "${{ env.UPGRADE_BRANCH_NAME }}" \
+          --title "[Liferay Upgrade] To ${{ env.LFR_LATEST_PRODUCT_VERSION_NAME }}" \
+          --body-file pr-body.md
