@@ -21,7 +21,9 @@ inputs:
     required: true
     default: "zulu"
   workspace-directory:
-    description: "Path to your workspace if different from root directory."
+    description: >
+      Path to your workspace if different from root directory.
+      It will be use in this actions steps for the 'working-directory' directive.
     required: false
     default: .
   checkout:
