@@ -1,4 +1,5 @@
-name: Release
+name: release
+run-name: Create Release
 
 on:
   push:
@@ -10,6 +11,8 @@ jobs:
     name: Publish Release
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
       - name: Create Release
         env:
           GH_TOKEN: ${{ github.token }}
