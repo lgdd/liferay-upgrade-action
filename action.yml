@@ -125,6 +125,7 @@ runs:
     - name: Create Branch & Commit Changes
       shell: bash
       if: always() && steps.check-branch.outputs.status == 'upgrade'
+      id: create-branch
       working-directory: ${{ inputs.workspace-directory }}
       run: |
         git config user.name github-actions[bot]
@@ -136,6 +137,7 @@ runs:
     - name: Create Pull Request
       shell: bash
       if: steps.check-branch.outputs.status == 'upgrade'
+      id: create-pull-request
       working-directory: ${{ inputs.workspace-directory }}
       env:
         GH_TOKEN: ${{ github.token }}
@@ -151,6 +153,6 @@ runs:
           --body-file pr-body.md
     - name: Remove Branch If Pull Request Fails
       shell: bash
-      if: failure()
+      if: steps.create-branch.outcome == 'success' && steps.create-pull-request.outcome == 'failure'
       run: |
         git push origin -d ${{ env.UPGRADE_BRANCH_NAME }}
