@@ -48,9 +48,9 @@ runs:
     - name: Set Env with Liferay Info
       uses: actions/github-script@v6
       env:
-        LFR_CURRENT_PRODUCT_NAME: steps.get-liferay-info.outputs.current-product-name
-        LFR_LATEST_PRODUCT_NAME: steps.get-liferay-info.outputs.latest-product-name
-        LFR_LATEST_PRODUCT_VERSION_NAME: steps.get-liferay-info.outputs.latest-product-version-name
+        LFR_CURRENT_PRODUCT_NAME: ${{ steps.get-liferay-info.outputs.current-product-name }}
+        LFR_LATEST_PRODUCT_NAME: ${{ steps.get-liferay-info.outputs.latest-product-name }}
+        LFR_LATEST_PRODUCT_VERSION_NAME: ${{ steps.get-liferay-info.outputs.latest-product-version-name }}
       with:
         script: |
           const { LFR_CURRENT_PRODUCT_NAME, LFR_LATEST_PRODUCT_NAME, LFR_LATEST_PRODUCT_VERSION_NAME } = process.env;
