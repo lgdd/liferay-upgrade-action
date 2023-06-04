@@ -133,3 +133,9 @@ runs:
           --head "${{ env.UPGRADE_BRANCH_NAME }}" \
           --title "[Liferay Upgrade] To ${{ env.LFR_LATEST_PRODUCT_VERSION_NAME }}" \
           --body-file pr-body.md
+    - name: Remove Branch If Pull Request Fails
+      shell: bash
+      if: failure()
+      run: |
+        git branch -d ${{ env.UPGRADE_BRANCH_NAME }}
+        git push origin -d ${{ env.UPGRADE_BRANCH_NAME }}
