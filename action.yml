@@ -47,19 +47,18 @@ runs:
         workspace-directory: ${{ inputs.workspace-directory }}
     - name: Set Env with Liferay Info
       uses: actions/github-script@v6
+      env:
+        LFR_CURRENT_PRODUCT_NAME: steps.get-liferay-info.outputs.current-product-name
+        LFR_LATEST_PRODUCT_NAME: steps.get-liferay-info.outputs.latest-product-name
+        LFR_LATEST_PRODUCT_VERSION_NAME: steps.get-liferay-info.outputs.latest-product-version-name
       with:
         script: |
-          const currentProductName = "${{ steps.get-liferay-info.outputs.current-product-name }}";
-          const latestProductName = "${{ steps.get-liferay-info.outputs.latest-product-name }}";
-          const latestProductVersionName = "${{ steps.get-liferay-info.outputs.latest-product-version-name }}";
-          core.info("current-product-name=" + currentProductName)
-          core.info("latest-product-name=" + latestProductName)
-          core.info("latest-product-version-name=" + latestProductVersionName)
-          const upgradeBranchName = `upgrade-to-${latestProductName.replaceAll('.', '')}`;
-          core.setOutput("LFR_CURRENT_PRODUCT_NAME", currentProductName)
-          core.setOutput("LFR_LATEST_PRODUCT_NAME", latestProductName)
-          core.setOutput("LFR_LATEST_PRODUCT_VERSION_NAME", latestProductVersionName)
-          core.setOutput("UPGRADE_BRANCH_NAME", upgradeBranchName)
+          const { LFR_CURRENT_PRODUCT_NAME, LFR_LATEST_PRODUCT_NAME, LFR_LATEST_PRODUCT_VERSION_NAME } = process.env;
+          const upgradeBranchName = `upgrade-to-${LFR_LATEST_PRODUCT_NAME.replaceAll('.', '')}`;
+          core.exportVariable("LFR_CURRENT_PRODUCT_NAME", LFR_CURRENT_PRODUCT_NAME)
+          core.exportVariable("LFR_LATEST_PRODUCT_NAME", LFR_LATEST_PRODUCT_NAME)
+          core.exportVariable("LFR_LATEST_PRODUCT_VERSION_NAME", LFR_LATEST_PRODUCT_VERSION_NAME)
+          core.exportVariable("UPGRADE_BRANCH_NAME", upgradeBranchName)
     - name: Check If Upgrade Needed
       shell: bash
       id: check-upgrade
