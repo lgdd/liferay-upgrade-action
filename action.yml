@@ -129,6 +129,8 @@ runs:
       shell: bash
       if: steps.check-branch.outputs.status == 'upgrade'
       working-directory: ${{ inputs.workspace-directory }}
+      env:
+        GH_TOKEN: ${{ github.token }}
       run: |
         echo "Build output:" >> pr-body.md
         echo "\`\`\`" >> pr-body.md
