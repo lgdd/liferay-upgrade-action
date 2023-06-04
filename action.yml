@@ -1,12 +1,19 @@
 name: "Liferay Upgrade Action"
 description: "Create a new branch and pull request if a new Liferay version is available"
+author: "lgdd"
+
 inputs:
   java-version:
-    description: "Java version (default: '11'). Check Liferay compatibility matrix: https://www.liferay.com/compatibility-matrix."
+    description: >
+      Java version (default: '11')
+      Check Liferay compatibility matrix: https://www.liferay.com/compatibility-matrix.
     required: true
     default: "11"
   java-distribution:
-    description: "Java distribution (default: 'zulu'). Check Liferay compatibility matrix: https://www.liferay.com/compatibility-matrix. List of supported distributions for the setup-java action: https://github.com/actions/setup-java#supported-distributions"
+    description: >
+      Java distribution (default: 'zulu')
+      List of supported distributions for the setup-java action: https://github.com/actions/setup-java#supported-distributions
+      Also check Liferay compatibility matrix: https://www.liferay.com/compatibility-matrix
     required: true
     default: "zulu"
   workspace-directory:
