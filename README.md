@@ -14,7 +14,7 @@ More information in [GitHub Actions documentation](https://docs.github.com/en/re
 
 ## Usage
 
-You can use this action in a [GitHub Actions Workflow](https://help.github.com/en/articles/about-github-actions) by a adding a YAML workflow file under `.github/workflows/` with the following content:
+You can use this action in a [GitHub Actions Workflow](https://help.github.com/en/articles/about-github-actions) by a adding a YAML file under `.github/workflows/` with the following content:
 
 ```yaml
 name: liferay-auto-upgrade
