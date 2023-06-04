@@ -146,5 +146,4 @@ runs:
       shell: bash
       if: failure()
       run: |
-        git branch -d ${{ env.UPGRADE_BRANCH_NAME }}
         git push origin -d ${{ env.UPGRADE_BRANCH_NAME }}
