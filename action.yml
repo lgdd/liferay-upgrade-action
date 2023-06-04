@@ -50,6 +50,9 @@ runs:
           const currentProductName = "${{ steps.get-liferay-info.outputs.current-product-name }}";
           const latestProductName = "${{ steps.get-liferay-info.outputs.latest-product-name }}";
           const latestProductVersionName = "${{ steps.get-liferay-info.outputs.latest-product-version-name }}";
+          core.info(currentProductName)
+          core.info(latestProductName)
+          core.info(latestProductVersionName)
           const upgradeBranchName = `upgrade-to-${latestProductName.replaceAll('.', '')}`;
           core.setOutput("LFR_CURRENT_PRODUCT_NAME", currentProductName)
           core.setOutput("LFR_LATEST_PRODUCT_NAME", latestProductName)
