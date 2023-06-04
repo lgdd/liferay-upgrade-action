@@ -40,31 +40,20 @@ runs:
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
-    - name: Get Current Liferay Update
-      shell: bash
-      working-directory: ${{ inputs.workspace-directory }}
-      run: |
-        echo "LFR_CURRENT_PRODUCT_NAME=$(cat gradle.properties | grep liferay.workspace.product= | cut -d '=' -f2)" >> $GITHUB_ENV
-    - name: Fetch Latest Liferay Update
+    - name: Get Liferay Info
+      id: get-liferay-info
+      uses: lgdd/get-liferay-info-action@main
+    - name: Set Env with Liferay Info
       uses: actions/github-script@v6
-      with:
-        script: |
-          const { LFR_CURRENT_PRODUCT_NAME } = process.env;
-          const productSplit = LFR_CURRENT_PRODUCT_NAME.split('-');
-          const currentEdition = productSplit[0]
-          const currentVersion = productSplit[1].replaceAll('.', '')
-          const liferayProductInfoUrl =
-            `https://github.com/lgdd/liferay-product-info/raw/main/${currentEdition}_${currentVersion}_product_info.json`;
-
-          fetch(liferayProductInfoUrl, { method: 'Get' })
-            .then((res) => res.json())
-            .then((json) => {
-              const latestProduct = json[json.length - 1];
-              const upgradeBranchName = latestProduct.name.replaceAll('.', '');
-              core.exportVariable('LFR_LATEST_PRODUCT_NAME', latestProduct.name);
-              core.exportVariable('LFR_LATEST_PRODUCT_VERSION_NAME', latestProduct.liferayProductVersion);
-              core.exportVariable('UPGRADE_BRANCH_NAME', `upgrade-to-${latestProduct.name.replaceAll('.', '')}`);
-            });
+      run: |
+        const currentProductName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
+        const latestProductName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
+        const latestProductVersionName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
+        const upgradeBranchName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
+        core.setOutput("LFR_CURRENT_PRODUCT_NAME", currentProductName)
+        core.setOutput("LFR_LATEST_PRODUCT_NAME", latestProductName)
+        core.setOutput("LFR_LATEST_PRODUCT_VERSION_NAME", latestProductVersionName)
+        core.setOutput("UPGRADE_BRANCH_NAME",  `upgrade-to-${latestProductName.replaceAll('.', '')}`)
     - name: Check If Upgrade Needed
       shell: bash
       id: check-upgrade
