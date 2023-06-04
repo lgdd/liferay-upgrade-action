@@ -2,6 +2,10 @@ name: "Liferay Upgrade"
 description: "Create a new branch and pull request if a new Liferay version is available"
 author: "lgdd"
 
+branding:
+  icon: "git-branch"
+  color: "blue"
+
 inputs:
   java-version:
     description: >
