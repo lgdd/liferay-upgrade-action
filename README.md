@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Liferay Upgrade
-        uses: lgdd/liferay-upgrade-action@main
+        uses: lgdd/liferay-upgrade-action@v1
         with:
           java-distribution: 'zulu'
           java-version: '11'
