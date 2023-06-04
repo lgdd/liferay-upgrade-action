@@ -45,15 +45,16 @@ runs:
       uses: lgdd/get-liferay-info-action@main
     - name: Set Env with Liferay Info
       uses: actions/github-script@v6
-      run: |
-        const currentProductName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
-        const latestProductName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
-        const latestProductVersionName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
-        const upgradeBranchName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
-        core.setOutput("LFR_CURRENT_PRODUCT_NAME", currentProductName)
-        core.setOutput("LFR_LATEST_PRODUCT_NAME", latestProductName)
-        core.setOutput("LFR_LATEST_PRODUCT_VERSION_NAME", latestProductVersionName)
-        core.setOutput("UPGRADE_BRANCH_NAME",  `upgrade-to-${latestProductName.replaceAll('.', '')}`)
+      with:
+        script: |
+          const currentProductName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
+          const latestProductName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
+          const latestProductVersionName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
+          const upgradeBranchName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
+          core.setOutput("LFR_CURRENT_PRODUCT_NAME", currentProductName)
+          core.setOutput("LFR_LATEST_PRODUCT_NAME", latestProductName)
+          core.setOutput("LFR_LATEST_PRODUCT_VERSION_NAME", latestProductVersionName)
+          core.setOutput("UPGRADE_BRANCH_NAME",  `upgrade-to-${latestProductName.replaceAll('.', '')}`)
     - name: Check If Upgrade Needed
       shell: bash
       id: check-upgrade
