@@ -83,7 +83,7 @@ runs:
       run: |
         NO_UPGRADE_BRANCH=$(git ls-remote -q | grep -q '${{ env.UPGRADE_BRANCH_NAME }}' && echo false || echo true)
         echo "NO_UPGRADE_BRANCH=$NO_UPGRADE_BRANCH" >> $GITHUB_ENV
-        if [ $NO_UPGRADE_BRANCH ]; then
+        if [ $NO_UPGRADE_BRANCH = true ]; then
           echo "Upgrade branch ${{ env.UPGRADE_BRANCH_NAME }} doesn't exist."
           echo "status=upgrade" >> $GITHUB_OUTPUT
         else
