@@ -21,7 +21,7 @@ runs:
       uses: actions/checkout@v3
     - name: Get Current Liferay Update
       shell: bash
-      working-directory: ${{ env.WORKING_DIRECTORY }}
+      working-directory: ${{ inputs.workspace-directory }}
       run: |
         echo "LFR_CURRENT_PRODUCT_NAME=$(cat gradle.properties | grep liferay.workspace.product= | cut -d '=' -f2)" >> $GITHUB_ENV
     - name: Fetch Latest Liferay Update
@@ -73,8 +73,8 @@ runs:
       uses: actions/setup-java@v3
       if: steps.check-branch.outputs.status == 'upgrade'
       with:
-        distribution: ${{ env.JAVA_DISTRIBUTION || 'zulu' }}
-        java-version: ${{ env.JAVA_VERSION || 11 }}
+        distribution: ${{ inputs.java-distribution }}
+        java-version: ${{ inputs.java-version }}
     - name: Cache Gradle Packages
       uses: actions/cache@v3
       if: steps.check-branch.outputs.status == 'upgrade'
@@ -89,7 +89,7 @@ runs:
       shell: bash
       if: steps.check-branch.outputs.status == 'upgrade'
       id: build-workspace
-      working-directory: ${{ env.WORKING_DIRECTORY }}
+      working-directory: ${{ inputs.workspace-directory }}
       run: |
         sed -i -e 's/${{ env.LFR_CURRENT_PRODUCT_NAME }}/${{ env.LFR_LATEST_PRODUCT_NAME }}/g' gradle.properties
         ./gradlew
@@ -110,7 +110,7 @@ runs:
     - name: Create Branch & Commit Changes
       shell: bash
       if: always() && steps.check-branch.outputs.status == 'upgrade'
-      working-directory: ${{ env.WORKING_DIRECTORY }}
+      working-directory: ${{ inputs.workspace-directory }}
       run: |
         git config user.name github-actions[bot]
         git config user.email 41898282+github-actions[bot]@users.noreply.github.com
@@ -121,7 +121,7 @@ runs:
     - name: Create Pull Request
       shell: bash
       if: steps.check-branch.outputs.status == 'upgrade'
-      working-directory: ${{ env.WORKING_DIRECTORY }}
+      working-directory: ${{ inputs.workspace-directory }}
       run: |
         echo "Build output:" >> pr-body.md
         echo "\`\`\`" >> pr-body.md
