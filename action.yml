@@ -1,4 +1,4 @@
-name: "Liferay Upgrade Action"
+name: "Liferay Upgrade"
 description: "Create a new branch and pull request if a new Liferay version is available"
 author: "lgdd"
 
@@ -107,11 +107,13 @@ runs:
             cat gradle-err.txt
             rm gradle-err.txt
             rm gradle-out.txt
+            echo "❌ Build failed with output:" >> pr-body.md
             exit 1
         else
             cat gradle-out.txt
             rm gradle-err.txt
             rm gradle-out.txt
+            echo "✅ Build succeeded with output:" >> pr-body.md
             exit 0
         fi;
     - name: Create Branch & Commit Changes
@@ -132,7 +134,6 @@ runs:
       env:
         GH_TOKEN: ${{ github.token }}
       run: |
-        echo "Build output:" >> pr-body.md
         echo "\`\`\`" >> pr-body.md
         cat gradle-build.txt >> pr-body.md
         echo "\`\`\`" >> pr-body.md
