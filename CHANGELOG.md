@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/lgdd/liferay-upgrade-action/compare/v1.0.0...v1.0.1) (2023-06-04)
+
+
+### Bug Fixes
+
+* check branch step shell syntax ([51e447c](https://github.com/lgdd/liferay-upgrade-action/commit/51e447c46887d0981854b0b401762866f1f9e26f))
+
 ## 1.0.0 (2023-06-04)
 
 
