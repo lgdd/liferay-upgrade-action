@@ -47,14 +47,14 @@ runs:
       uses: actions/github-script@v6
       with:
         script: |
-          const currentProductName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
-          const latestProductName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
-          const latestProductVersionName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
-          const upgradeBranchName = "${{ steps.get-liferay-info.outputs.current-product.name }}";
+          const currentProductName = "${{ steps.get-liferay-info.outputs.current-product-name }}";
+          const latestProductName = "${{ steps.get-liferay-info.outputs.latest-product-name }}";
+          const latestProductVersionName = "${{ steps.get-liferay-info.outputs.latest-product-version-name }}";
+          const upgradeBranchName = `upgrade-to-${latestProductName.replaceAll('.', '')}`;
           core.setOutput("LFR_CURRENT_PRODUCT_NAME", currentProductName)
           core.setOutput("LFR_LATEST_PRODUCT_NAME", latestProductName)
           core.setOutput("LFR_LATEST_PRODUCT_VERSION_NAME", latestProductVersionName)
-          core.setOutput("UPGRADE_BRANCH_NAME",  `upgrade-to-${latestProductName.replaceAll('.', '')}`)
+          core.setOutput("UPGRADE_BRANCH_NAME", upgradeBranchName)
     - name: Check If Upgrade Needed
       shell: bash
       id: check-upgrade
