@@ -24,11 +24,17 @@ inputs:
     description: "Path to your workspace if different from root directory."
     required: false
     default: .
+  checkout:
+    description: >
+      Set to 'false' if you add a checkout step before this action, 'true' if you want this action to perform the checkout step.
+    required: false
+    default: "true"
 
 runs:
   using: composite
   steps:
     - name: Checkout
+      if: ${{ inputs.checkout == 'true' }}
       uses: actions/checkout@v3
       with:
         fetch-depth: 0
