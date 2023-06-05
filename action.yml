@@ -42,7 +42,7 @@ runs:
         fetch-depth: 0
     - name: Get Liferay Info
       id: get-liferay-info
-      uses: lgdd/get-liferay-info-action@main
+      uses: lgdd/get-liferay-info-action@v1
       with:
         workspace-directory: ${{ inputs.workspace-directory }}
     - name: Set Env with Liferay Info
