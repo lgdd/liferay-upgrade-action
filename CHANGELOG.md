@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.0.2](https://github.com/lgdd/liferay-upgrade-action/compare/v1.0.1...v1.0.2) (2023-06-05)
+
+
+### Bug Fixes
+
+* fix output syntax ([47f9d01](https://github.com/lgdd/liferay-upgrade-action/commit/47f9d0134488467bbffb8f3e1cf22ddc4a1eea66))
+* incorrect output keys ([cf9657f](https://github.com/lgdd/liferay-upgrade-action/commit/cf9657f828478c62618b365198eb50906eac34e9))
+* missuse of run (script instead) ([0877cfb](https://github.com/lgdd/liferay-upgrade-action/commit/0877cfbf5bad31f4905d3b6edd650f845aef9c82))
+* pass input to get-liferay-info ([b26ce31](https://github.com/lgdd/liferay-upgrade-action/commit/b26ce31dd0fafa4857377a385eb4902423180b4f))
+* step outputs pass as env vars ([037ced1](https://github.com/lgdd/liferay-upgrade-action/commit/037ced1ac2560ea8e09d7c8f261806b6863880c9))
+
 ## [1.0.1](https://github.com/lgdd/liferay-upgrade-action/compare/v1.0.0...v1.0.1) (2023-06-04)
 
 
