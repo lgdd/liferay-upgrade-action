@@ -1,6 +1,8 @@
 # Liferay Upgrade Action
 
-GitHub Action to create a new branch and pull request if a new Liferay version is available
+GitHub Action to create a new branch and pull request if a new Liferay version is available.
+
+This action uses another action you might find useful: https://github.com/lgdd/get-liferay-info-action
 
 ## Requirements
 
