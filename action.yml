@@ -26,20 +26,10 @@ inputs:
       It will be use in this actions steps for the 'working-directory' directive.
     required: false
     default: .
-  checkout:
-    description: >
-      Set to 'false' if you add a checkout step before this action, 'true' if you want this action to perform the checkout step.
-    required: false
-    default: "true"
 
 runs:
   using: composite
   steps:
-    - name: Checkout
-      if: ${{ inputs.checkout == 'true' }}
-      uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
     - name: Get Liferay Info
       id: get-liferay-info
       uses: lgdd/get-liferay-info-action@v1
