@@ -36,7 +36,7 @@ func main() {
 	gitMergeMainIntoUpgrade(mainBranchName, upgradeBranchName)
 
 	updateGradleProperties("gradle.properties", currentProductName, latestProductName)
-	gradleBuildResultInMarkdown := runGradleAndGetResultInMarkdown()
+	gradleBuildResultInMarkdown := runGradleAndGetResultInMarkdown(latestProductVersionName)
 	gitCommitAndPush(upgradeBranchName)
 
 	pullRequestTitle := "[Liferay Upgrade] To " + latestProductVersionName
@@ -44,7 +44,7 @@ func main() {
 	createOrEditPullRequest(mainBranchName, upgradeBranchName, pullRequestTitle, pullRequestBody)
 }
 
-func runGradleAndGetResultInMarkdown() string {
+func runGradleAndGetResultInMarkdown(latestProductVersionName string) string {
 	var stdoutBuffer, stderrBuffer bytes.Buffer
 	cmd := exec.Command("./gradlew", "build", "-S")
 	cmd.Stdout = &stdoutBuffer
@@ -58,12 +58,18 @@ func runGradleAndGetResultInMarkdown() string {
 	var gradleResultBuilder strings.Builder
 
 	if len(stderrBuffer.String()) > 0 {
-		gradleResultBuilder.WriteString("❌ Build failed with output:")
+		gradleResultBuilder.WriteString("# ❌ Build for ")
+		gradleResultBuilder.WriteString(latestProductVersionName)
+		gradleResultBuilder.WriteString(" failed\n")
+		gradleResultBuilder.WriteString("## Gradle output:\n")
 	} else {
-		gradleResultBuilder.WriteString("✅ Build succeeded with output:")
+		gradleResultBuilder.WriteString("# ✅ Build for ")
+		gradleResultBuilder.WriteString(latestProductVersionName)
+		gradleResultBuilder.WriteString(" succeeded\n")
+		gradleResultBuilder.WriteString("## Gradle output:\n")
 	}
 
-	gradleResultBuilder.WriteString("```")
+	gradleResultBuilder.WriteString("```\n")
 	gradleResultBuilder.WriteString(stdoutBuffer.String())
 	gradleResultBuilder.WriteString("\n")
 	gradleResultBuilder.WriteString(stderrBuffer.String())
