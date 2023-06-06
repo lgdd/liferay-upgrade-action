@@ -126,7 +126,7 @@ func gitSwitchBranch(noUpgradeBranch bool, upgradeBranchName string) {
 }
 
 func gitCommitAndPush(upgradeBranchName string) {
-	runCmd("git", "add", "--all", "--", "':!go-upgrade'")
+	runCmd("git", "add", "gradle.properties")
 
 	cmd := exec.Command("git", "diff-index", "--quiet", "HEAD")
 	cmd.Stdout = os.Stdout
