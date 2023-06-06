@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -35,7 +36,7 @@ func main() {
 	gitSwitchBranch(noUpgradeBranch, upgradeBranchName)
 	gitMergeMainIntoUpgrade(mainBranchName, upgradeBranchName)
 
-	updateGradleProperties(workspacePath, currentProductName, latestProductName)
+	updateGradleProperties(filepath.Join(workspacePath, "gradle.properties"), currentProductName, latestProductName)
 	gradleBuildResult := runGradleAndGetResult()
 	gitCommitAndPush(workspacePath, upgradeBranchName)
 
@@ -166,7 +167,7 @@ func createPullRequest(mainBranchName, upgradeBranchName, title, body string) {
 
 func printExpectedEnvVariables(keys ...string) {
 	for _, key := range keys {
-		fmt.Println(os.Getenv(key))
+		fmt.Println(key + "=" + os.Getenv(key))
 	}
 }
 
