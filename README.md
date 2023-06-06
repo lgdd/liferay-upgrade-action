@@ -47,15 +47,28 @@ More information about [Github Actions Events](https://docs.github.com/en/action
 
 ## v2
 
-In v1, the checkout step was done by default inside that action. Even if you could disable it with an input, it doesn't feel like a good practice to include that in a custom action. So **in v2 you need to add the checkout step first**:
+In v1, the checkout step was done by default inside that action. Even if you could disable it with an input, it doesn't feel like a good practice to include that in a custom action.
 
-```yaml
+So **In v2 you need to add the checkout step first**:
+
+```diff
+steps:
++     - uses: actions/checkout@v3
+      - uses: lgdd/liferay-upgrade-action@v2
+        with:
+          java-distribution: 'zulu'
+          java-version: '11'
+```
+
+If you were already using the checkout action in v1, you can now remove the input in v2:
+```diff
 steps:
       - uses: actions/checkout@v3
       - uses: lgdd/liferay-upgrade-action@v2
         with:
           java-distribution: 'zulu'
           java-version: '11'
+-         checkout: false
 ```
 
 ## License
