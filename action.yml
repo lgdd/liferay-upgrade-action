@@ -35,116 +35,33 @@ runs:
       uses: lgdd/get-liferay-info-action@v1
       with:
         workspace-directory: ${{ inputs.workspace-directory }}
-    - name: Set Env with Liferay Info
+    - name: Set Upgrade Branch Name
       uses: actions/github-script@v6
       env:
-        LFR_CURRENT_PRODUCT_NAME: ${{ steps.get-liferay-info.outputs.current-product-name }}
         LFR_LATEST_PRODUCT_NAME: ${{ steps.get-liferay-info.outputs.latest-product-name }}
-        LFR_LATEST_PRODUCT_VERSION_NAME: ${{ steps.get-liferay-info.outputs.latest-product-version-name }}
       with:
         script: |
-          const { LFR_CURRENT_PRODUCT_NAME, LFR_LATEST_PRODUCT_NAME, LFR_LATEST_PRODUCT_VERSION_NAME } = process.env;
+          const { LFR_LATEST_PRODUCT_NAME } = process.env;
           const upgradeBranchName = `upgrade-to-${LFR_LATEST_PRODUCT_NAME.replaceAll('.', '')}`;
-          core.exportVariable("LFR_CURRENT_PRODUCT_NAME", LFR_CURRENT_PRODUCT_NAME)
-          core.exportVariable("LFR_LATEST_PRODUCT_NAME", LFR_LATEST_PRODUCT_NAME)
-          core.exportVariable("LFR_LATEST_PRODUCT_VERSION_NAME", LFR_LATEST_PRODUCT_VERSION_NAME)
           core.exportVariable("UPGRADE_BRANCH_NAME", upgradeBranchName)
-    - name: Check If Upgrade Needed
-      shell: bash
-      id: check-upgrade
-      run: |
-        if [ "${{ env.LFR_LATEST_PRODUCT_NAME }}" = "${{ env.LFR_CURRENT_PRODUCT_NAME }}" ]; then
-          echo "Already on the latest version: ${{ env.LFR_LATEST_PRODUCT_NAME }}"
-          echo "status=skip" >> $GITHUB_OUTPUT
-        else
-          echo "Run upgrade from ${{ env.LFR_CURRENT_PRODUCT_NAME }} to ${{ env.LFR_LATEST_PRODUCT_NAME }}"
-          echo "status=upgrade" >> $GITHUB_OUTPUT
-        fi;
-    - name: Check Upgrade Branch
-      shell: bash
-      id: check-branch
-      if: steps.check-upgrade.outputs.status == 'upgrade'
+    - shell: bash
+      env:
+        UPGRADE_BRANCH_NAME: "upgrade-liferay-cloud-images"
       run: |
         NO_UPGRADE_BRANCH=$(git ls-remote -q | grep -q '${{ env.UPGRADE_BRANCH_NAME }}' && echo false || echo true)
         echo "NO_UPGRADE_BRANCH=$NO_UPGRADE_BRANCH" >> $GITHUB_ENV
-        if [ $NO_UPGRADE_BRANCH = true ]; then
-          echo "Upgrade branch ${{ env.UPGRADE_BRANCH_NAME }} doesn't exist."
-          echo "status=upgrade" >> $GITHUB_OUTPUT
-        else
-          echo "Upgrade branch ${{ env.UPGRADE_BRANCH_NAME }} already exists."
-          echo "status=skip" >> $GITHUB_OUTPUT
-        fi;
-    - name: Set up JDK
-      uses: actions/setup-java@v3
-      if: steps.check-branch.outputs.status == 'upgrade'
+    - uses: actions/setup-go@v4
       with:
-        distribution: ${{ inputs.java-distribution }}
-        java-version: ${{ inputs.java-version }}
-    - name: Cache Gradle Packages
-      uses: actions/cache@v3
-      if: steps.check-branch.outputs.status == 'upgrade'
-      with:
-        path: |
-          ~/.gradle/caches
-          ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-        restore-keys: |
-          ${{ runner.os }}-gradle-
-    - name: Build Workspace
+        go-version: ">=1.20.0"
+    - run: go build -C ${{ github.action_path }} -o go-upgrade
       shell: bash
-      if: steps.check-branch.outputs.status == 'upgrade'
-      id: build-workspace
-      working-directory: ${{ inputs.workspace-directory }}
-      run: |
-        sed -i -e 's/${{ env.LFR_CURRENT_PRODUCT_NAME }}/${{ env.LFR_LATEST_PRODUCT_NAME }}/g' gradle.properties
-        ./gradlew
-        ./gradlew build -S > gradle-out.txt 2> gradle-err.txt
-        cat gradle-out.txt >> gradle-build.txt
-        cat gradle-err.txt >> gradle-build.txt
-        if [ -s gradle-err.txt ]; then
-            cat gradle-err.txt
-            rm gradle-err.txt
-            rm gradle-out.txt
-            echo "❌ Build failed with output:" >> pr-body.md
-            exit 1
-        else
-            cat gradle-out.txt
-            rm gradle-err.txt
-            rm gradle-out.txt
-            echo "✅ Build succeeded with output:" >> pr-body.md
-            exit 0
-        fi;
-    - name: Create Branch & Commit Changes
+    - run: cp ${{ github.action_path }}/go-upgrade . && chmod +x go-upgrade
       shell: bash
-      if: always() && steps.check-branch.outputs.status == 'upgrade'
-      id: create-branch
-      working-directory: ${{ inputs.workspace-directory }}
-      run: |
-        git config user.name github-actions[bot]
-        git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-        git checkout -b ${{ env.UPGRADE_BRANCH_NAME }}
-        git add --all -- ':!gradle-build.txt'
-        git commit -m "chore: upgrade to ${{ env.LFR_LATEST_PRODUCT_NAME }}"
-        git push -u origin ${{ env.UPGRADE_BRANCH_NAME }}
-    - name: Create Pull Request
+    - run: ./go-upgrade
       shell: bash
-      if: steps.check-branch.outputs.status == 'upgrade'
-      id: create-pull-request
-      working-directory: ${{ inputs.workspace-directory }}
       env:
         GH_TOKEN: ${{ github.token }}
-      run: |
-        echo "\`\`\`" >> pr-body.md
-        cat gradle-build.txt >> pr-body.md
-        echo "\`\`\`" >> pr-body.md
-        gh pr create \
-          --assignee "${{ github.repository_owner }}" \
-          --base "${{ env.GITHUB_REF_NAME }}" \
-          --head "${{ env.UPGRADE_BRANCH_NAME }}" \
-          --title "[Liferay Upgrade] To ${{ env.LFR_LATEST_PRODUCT_VERSION_NAME }}" \
-          --body-file pr-body.md
-    - name: Remove Branch If Pull Request Fails
-      shell: bash
-      if: steps.create-branch.outcome == 'success' && steps.create-pull-request.outcome == 'failure'
-      run: |
-        git push origin -d ${{ env.UPGRADE_BRANCH_NAME }}
+        WORKSPACE_DIRECTORY: ${{ inputs.workspace-directory }}
+        LFR_CURRENT_PRODUCT_NAME: ${{ steps.get-liferay-info.outputs.current-product-name }}
+        LFR_LATEST_PRODUCT_NAME: ${{ steps.get-liferay-info.outputs.latest-product-name }}
+        LFR_LATEST_PRODUCT_VERSION_NAME: ${{ steps.get-liferay-info.outputs.latest-product-version-name }}
