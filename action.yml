@@ -45,8 +45,6 @@ runs:
           const upgradeBranchName = `upgrade-to-${LFR_LATEST_PRODUCT_NAME.replaceAll('.', '')}`;
           core.exportVariable("UPGRADE_BRANCH_NAME", upgradeBranchName)
     - shell: bash
-      env:
-        UPGRADE_BRANCH_NAME: "upgrade-liferay-cloud-images"
       run: |
         NO_UPGRADE_BRANCH=$(git ls-remote -q | grep -q '${{ env.UPGRADE_BRANCH_NAME }}' && echo false || echo true)
         echo "NO_UPGRADE_BRANCH=$NO_UPGRADE_BRANCH" >> $GITHUB_ENV
