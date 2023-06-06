@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.0.1](https://github.com/lgdd/liferay-upgrade-action/compare/v2.0.0...v2.0.1) (2023-06-06)
+
+
+### Bug Fixes
+
+* gradle build & getting output ([d534a7d](https://github.com/lgdd/liferay-upgrade-action/commit/d534a7d6afcd4f0da3049d5ccd2b4eef3c45bf35))
+* gradle.properties path ([c963b43](https://github.com/lgdd/liferay-upgrade-action/commit/c963b430e64855329a74732aa7ee148c3309585b))
+* remove working-directory for setup-go ([06ed407](https://github.com/lgdd/liferay-upgrade-action/commit/06ed407191753cc7590c95df9016f9a839efb3c3))
+* use working-directory to properly find workspace files ([5f3dcdb](https://github.com/lgdd/liferay-upgrade-action/commit/5f3dcdb56c68c29f431fee27c4a14b27ad59918f))
+* wrong upgrade branch name reference in yaml ([5d7bd63](https://github.com/lgdd/liferay-upgrade-action/commit/5d7bd63798e241fa8434a40230b27e3eac0eed5e))
+* wrong workspace path for git add ([95d981c](https://github.com/lgdd/liferay-upgrade-action/commit/95d981c151468f82d9086195a5aac8f43a4bd303))
+
 ## [2.0.0](https://github.com/lgdd/liferay-upgrade-action/compare/v1.0.2...v2.0.0) (2023-06-06)
 
 
