@@ -55,7 +55,6 @@ runs:
         java-version: ${{ inputs.java-version }}
     - name: Cache Gradle Packages
       uses: actions/cache@v3
-      working-directory: ${{ inputs.workspace-directory }}
       with:
         path: |
           ~/.gradle/caches
