@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.2](https://github.com/lgdd/liferay-upgrade-action/compare/v2.0.1...v2.0.2) (2023-06-06)
+
+
+### Bug Fixes
+
+* git commit ignore files ([3d8c1a3](https://github.com/lgdd/liferay-upgrade-action/commit/3d8c1a3d78d62cb2f94613eb6b2784505869076c))
+* remove working-directory from cache action ([e0f8483](https://github.com/lgdd/liferay-upgrade-action/commit/e0f848384551aa3c3a91fa1ccb97166a5aee150b))
+
 ## [2.0.1](https://github.com/lgdd/liferay-upgrade-action/compare/v2.0.0...v2.0.1) (2023-06-06)
 
 
