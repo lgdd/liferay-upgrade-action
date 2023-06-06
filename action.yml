@@ -76,7 +76,6 @@ runs:
       working-directory: ${{ inputs.workspace-directory }}
       env:
         GH_TOKEN: ${{ github.token }}
-        WORKSPACE_DIRECTORY: ${{ inputs.workspace-directory }}
         LFR_CURRENT_PRODUCT_NAME: ${{ steps.get-liferay-info.outputs.current-product-name }}
         LFR_LATEST_PRODUCT_NAME: ${{ steps.get-liferay-info.outputs.latest-product-name }}
         LFR_LATEST_PRODUCT_VERSION_NAME: ${{ steps.get-liferay-info.outputs.latest-product-version-name }}

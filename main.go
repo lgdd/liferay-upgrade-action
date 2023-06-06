@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	printExpectedEnvVariables("WORKSPACE_DIRECTORY", "GITHUB_REF_NAME",
+	printExpectedEnvVariables("GITHUB_REF_NAME",
 		"LFR_CURRENT_PRODUCT_NAME", "LFR_LATEST_PRODUCT_NAME",
 		"LFR_LATEST_PRODUCT_VERSION_NAME", "NO_UPGRADE_BRANCH")
 
