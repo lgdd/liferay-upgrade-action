@@ -27,11 +27,12 @@ on:
     # https://crontab.guru/every-monday
     - cron: '0 0 * * MON'
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   liferay-upgrade:
-    permissions:
-      contents: write # to push changes
-      pull-requests: write # to create pull requests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
