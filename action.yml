@@ -48,6 +48,21 @@ runs:
       run: |
         NO_UPGRADE_BRANCH=$(git ls-remote -q | grep -q '${{ env.UPGRADE_BRANCH_NAME }}' && echo false || echo true)
         echo "NO_UPGRADE_BRANCH=$NO_UPGRADE_BRANCH" >> $GITHUB_ENV
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: ${{ inputs.java-distribution }}
+        java-version: ${{ inputs.java-version }}
+    - name: Cache Gradle Packages
+      uses: actions/cache@v3
+      working-directory: ${{ inputs.workspace-directory }}
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
     - uses: actions/setup-go@v4
       with:
         go-version: ">=1.20.0"
