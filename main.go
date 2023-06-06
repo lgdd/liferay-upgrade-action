@@ -17,7 +17,6 @@ func main() {
 		"LFR_CURRENT_PRODUCT_NAME", "LFR_LATEST_PRODUCT_NAME",
 		"LFR_LATEST_PRODUCT_VERSION_NAME", "NO_UPGRADE_BRANCH")
 
-	workspacePath := os.Getenv("WORKSPACE_DIRECTORY")
 	mainBranchName := os.Getenv("GITHUB_REF_NAME")
 	currentProductName := os.Getenv("LFR_CURRENT_PRODUCT_NAME")
 	latestProductName := os.Getenv("LFR_LATEST_PRODUCT_NAME")
@@ -38,7 +37,7 @@ func main() {
 
 	updateGradleProperties("gradle.properties", currentProductName, latestProductName)
 	gradleBuildResultInMarkdown := runGradleAndGetResultInMarkdown()
-	gitCommitAndPush(workspacePath, upgradeBranchName)
+	gitCommitAndPush(upgradeBranchName)
 
 	pullRequestTitle := "[Liferay Upgrade] To " + latestProductVersionName
 	pullRequestBody := gradleBuildResultInMarkdown
@@ -118,8 +117,8 @@ func gitSwitchBranch(noUpgradeBranch bool, upgradeBranchName string) {
 	}
 }
 
-func gitCommitAndPush(path, upgradeBranchName string) {
-	runCmd("git", "add", path)
+func gitCommitAndPush(upgradeBranchName string) {
+	runCmd("git", "add", ".")
 
 	cmd := exec.Command("git", "diff-index", "--quiet", "HEAD")
 	cmd.Stdout = os.Stdout
