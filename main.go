@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -36,38 +37,37 @@ func main() {
 	gitMergeMainIntoUpgrade(mainBranchName, upgradeBranchName)
 
 	updateGradleProperties("gradle.properties", currentProductName, latestProductName)
-	gradleBuildResult := runGradleAndGetResult()
+	gradleBuildResultInMarkdown := runGradleAndGetResultInMarkdown()
 	gitCommitAndPush(workspacePath, upgradeBranchName)
 
 	pullRequestTitle := "[Liferay Upgrade] To " + latestProductVersionName
-	pullRequestBody := createPullRequestBodyMarkdown(gradleBuildResult)
+	pullRequestBody := gradleBuildResultInMarkdown
 	createOrEditPullRequest(mainBranchName, upgradeBranchName, pullRequestTitle, pullRequestBody)
 }
 
-func createPullRequestBodyMarkdown(gradleBuildResult string) string {
-	var pullRequestBodyBuilder strings.Builder
+func runGradleAndGetResultInMarkdown() string {
+	var stdoutBuffer, stderrBuffer bytes.Buffer
+	cmd := exec.Command("./gradlew", "build", "-S")
+	cmd.Stdout = &stdoutBuffer
+	cmd.Stderr = &stderrBuffer
 
-	if strings.Contains(gradleBuildResult, "BUILD FAILED") {
-		pullRequestBodyBuilder.WriteString("❌ Build failed with output:")
-	} else {
-		pullRequestBodyBuilder.WriteString("✅ Build succeeded with output:")
+	err := cmd.Run()
+
+	if err != nil {
+		panic(err)
+	}
+	var gradleResultBuilder strings.Builder
+
+	if len(stderrBuffer.String()) > 0 {
+		gradleResultBuilder.WriteString("❌ Build failed with output:")
 	}
 
-	pullRequestBodyBuilder.WriteString("```")
-	pullRequestBodyBuilder.WriteString(gradleBuildResult)
-	pullRequestBodyBuilder.WriteString("```")
-
-	return pullRequestBodyBuilder.String()
-}
-
-func runGradleAndGetResult() string {
-	runCmd("./gradlew", "build", "-S", ">", "gradle-out.txt", "2>", "gradle-err.txt")
-	var gradleResultBuilder strings.Builder
-	gradleResultBuilder.WriteString(getFileContentAsString("gradle-out.txt"))
+	gradleResultBuilder.WriteString("```")
+	gradleResultBuilder.WriteString(stdoutBuffer.String())
 	gradleResultBuilder.WriteString("\n")
-	gradleResultBuilder.WriteString(getFileContentAsString("gradle-err.txt"))
-	os.Remove("gradle-out.txt")
-	os.Remove("gradle-err.txt")
+	gradleResultBuilder.WriteString(stderrBuffer.String())
+	gradleResultBuilder.WriteString("```")
+
 	return gradleResultBuilder.String()
 }
 
