@@ -5,7 +5,6 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -36,7 +35,7 @@ func main() {
 	gitSwitchBranch(noUpgradeBranch, upgradeBranchName)
 	gitMergeMainIntoUpgrade(mainBranchName, upgradeBranchName)
 
-	updateGradleProperties(filepath.Join(workspacePath, "gradle.properties"), currentProductName, latestProductName)
+	updateGradleProperties("gradle.properties", currentProductName, latestProductName)
 	gradleBuildResult := runGradleAndGetResult()
 	gitCommitAndPush(workspacePath, upgradeBranchName)
 

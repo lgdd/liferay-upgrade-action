@@ -51,14 +51,18 @@ runs:
         NO_UPGRADE_BRANCH=$(git ls-remote -q | grep -q '${{ env.UPGRADE_BRANCH_NAME }}' && echo false || echo true)
         echo "NO_UPGRADE_BRANCH=$NO_UPGRADE_BRANCH" >> $GITHUB_ENV
     - uses: actions/setup-go@v4
+      working-directory: ${{ inputs.workspace-directory }}
       with:
         go-version: ">=1.20.0"
     - run: go build -C ${{ github.action_path }} -o go-upgrade
       shell: bash
+      working-directory: ${{ inputs.workspace-directory }}
     - run: cp ${{ github.action_path }}/go-upgrade . && chmod +x go-upgrade
       shell: bash
+      working-directory: ${{ inputs.workspace-directory }}
     - run: ./go-upgrade
       shell: bash
+      working-directory: ${{ inputs.workspace-directory }}
       env:
         GH_TOKEN: ${{ github.token }}
         WORKSPACE_DIRECTORY: ${{ inputs.workspace-directory }}
