@@ -59,6 +59,8 @@ func runGradleAndGetResultInMarkdown() string {
 
 	if len(stderrBuffer.String()) > 0 {
 		gradleResultBuilder.WriteString("❌ Build failed with output:")
+	} else {
+		gradleResultBuilder.WriteString("✅ Build succeeded with output:")
 	}
 
 	gradleResultBuilder.WriteString("```")
