@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0](https://github.com/lgdd/liferay-upgrade-action/compare/v1.0.2...v2.0.0) (2023-06-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* Checkout step included in this action has been removed. You need to add it first in your own workflow before using this action.
+
+### Miscellaneous Chores
+
+* remove the checkout step ([c1f1b0f](https://github.com/lgdd/liferay-upgrade-action/commit/c1f1b0f0c6dc6c960dffc2a730d2885991aebc89))
+
 ## [1.0.2](https://github.com/lgdd/liferay-upgrade-action/compare/v1.0.1...v1.0.2) (2023-06-05)
 
 
