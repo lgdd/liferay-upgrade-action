@@ -193,6 +193,7 @@ func gitSwitchBranch(noUpgradeBranch bool, upgradeBranchName string) {
 
 func gitCommitAndPush(upgradeBranchName string) {
 	runCmd("git", "add", "gradle.properties")
+	runCmd("git", "add", "settings.gradle")
 
 	cmd := exec.Command("git", "diff-index", "--quiet", "HEAD")
 	cmd.Stdout = os.Stdout
