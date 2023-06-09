@@ -1,11 +1,16 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"net/http"
 	"os"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -36,6 +41,7 @@ func main() {
 	gitMergeMainIntoUpgrade(mainBranchName, upgradeBranchName)
 
 	updateGradleProperties("gradle.properties", currentProductName, latestProductName)
+	updateSettingsGradle("settings.gradle")
 	gradleBuildResultInMarkdown := runGradleAndGetResultInMarkdown(latestProductVersionName)
 	gitCommitAndPush(upgradeBranchName)
 
@@ -91,6 +97,66 @@ func updateGradleProperties(path, currentProductName, latestProductName string) 
 	if err != nil {
 		panic(err)
 	}
+}
+func updateSettingsGradle(path string) {
+	versionRegex := regexp.MustCompile(`\d+.\d+.\d+`)
+	currentDependencyLine, err := getSettingsGradleWorkspaceDependencyLine()
+
+	if err != nil {
+		panic(err)
+	}
+
+	resp, err := http.Get("https://search.maven.org/solrsearch/select?q=a:com.liferay.gradle.plugins.workspace&rows=1&wt=json")
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+
+	var searchResponse MavenCentralSearchResponse
+	json.Unmarshal(body, &searchResponse)
+
+	if searchResponse.Body.NumFound == 0 {
+		fmt.Println("could not find com.liferay.gradle.plugins.workspace in maven central")
+		return
+	}
+
+	latestVersion := searchResponse.Body.Results[0].LatestVersion
+	latestDependencyLine := versionRegex.ReplaceAllString(currentDependencyLine, latestVersion)
+
+	read, err := os.ReadFile(path)
+
+	if err != nil {
+		panic(err)
+	}
+
+	newContents := strings.Replace(string(read), currentDependencyLine, latestDependencyLine, -1)
+
+	err = os.WriteFile(path, []byte(newContents), 0)
+	if err != nil {
+		panic(err)
+	}
+}
+
+func getSettingsGradleWorkspaceDependencyLine() (string, error) {
+	file, err := os.Open("settings.gradle")
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		if strings.Contains(scanner.Text(), "com.liferay.gradle.plugins.workspace") {
+			return scanner.Text(), nil
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+	return "", err
 }
 
 func gitConfigUser() {
@@ -197,4 +263,21 @@ func getFileContentAsString(path string) string {
 	}
 
 	return string(fileContent)
+}
+
+type MavenCentralSearchResponse struct {
+	Body struct {
+		NumFound int `json:"numFound"`
+		Results  []struct {
+			ID            string `json:"id"`
+			Group         string `json:"g"`
+			Artifact      string `json:"a"`
+			LatestVersion string `json:"latestVersion"`
+			Packaging     string `json:"p"`
+			Timestamp     int64  `json:"timestamp"`
+		} `json:"docs"`
+	} `json:"response"`
+	Spellcheck struct {
+		Suggestions []any `json:"suggestions"`
+	} `json:"spellcheck"`
 }
