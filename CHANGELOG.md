@@ -1,5 +1,18 @@
 # Changelog
 
+## [2.1.0](https://github.com/lgdd/liferay-upgrade-action/compare/v2.0.2...v2.1.0) (2023-06-09)
+
+
+### Features
+
+* add support to upgrade settings.gradle ([1c73b5c](https://github.com/lgdd/liferay-upgrade-action/commit/1c73b5c5b63393dec0e5ca1149ef37a4c105df74)), closes [#7](https://github.com/lgdd/liferay-upgrade-action/issues/7)
+
+
+### Bug Fixes
+
+* missing git add for settings.gradle ([755d11d](https://github.com/lgdd/liferay-upgrade-action/commit/755d11dc4caa945ef776038a5092d8ccf92ff197)), closes [#7](https://github.com/lgdd/liferay-upgrade-action/issues/7)
+* wrong commit message ([ce67554](https://github.com/lgdd/liferay-upgrade-action/commit/ce67554ff562562277fc924edac4d643cd699471))
+
 ## [2.0.2](https://github.com/lgdd/liferay-upgrade-action/compare/v2.0.1...v2.0.2) (2023-06-06)
 
 
