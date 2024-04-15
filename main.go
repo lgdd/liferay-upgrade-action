@@ -202,7 +202,7 @@ func gitCommitAndPush(upgradeBranchName string) {
 	err := cmd.Run()
 
 	if err != nil {
-		runCmd("git", "commit", "-m", "chore: upgrade liferay workspace")
+		runCmd("git", "commit", "-m", "chore!: upgrade liferay workspace")
 		runCmd("git", "push", "-u", "origin", upgradeBranchName)
 	}
 }
