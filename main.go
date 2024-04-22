@@ -40,7 +40,7 @@ func main() {
 	gradleBuildResultInMarkdown := runGradleAndGetResultInMarkdown(latestProductVersionName)
 	runCmd("git", "push", "-u", "origin", upgradeBranchName)
 
-	pullRequestTitle := "[Liferay Upgrade] To " + latestProductVersionName
+	pullRequestTitle := "build(liferay): workspace upgrade"
 	pullRequestBody := gradleBuildResultInMarkdown
 	createOrEditPullRequest(mainBranchName, upgradeBranchName, pullRequestTitle, pullRequestBody)
 }
