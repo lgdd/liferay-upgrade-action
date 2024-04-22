@@ -32,11 +32,6 @@ func main() {
 	gitConfigUser()
 	gitFetchAll()
 
-	if currentProductName == latestProductName {
-		fmt.Println("Liferay workspace is already set to the latest " + latestProductName)
-		os.Exit(0)
-	}
-
 	gitSwitchBranch(noUpgradeBranch, upgradeBranchName)
 	gitMergeMainIntoUpgrade(mainBranchName, upgradeBranchName)
 
