@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.3](https://github.com/lgdd/liferay-upgrade-action/compare/v2.1.2...v2.1.3) (2024-04-22)
+
+
+### Bug Fixes
+
+* merge commit message ([313d51c](https://github.com/lgdd/liferay-upgrade-action/commit/313d51c46539ba2db74446b6360c0840c440b554))
+
 ## [2.1.2](https://github.com/lgdd/liferay-upgrade-action/compare/v2.1.1...v2.1.2) (2024-04-22)
 
 
