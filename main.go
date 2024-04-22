@@ -5,7 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -113,7 +113,7 @@ func updateSettingsGradle(path string) {
 	}
 
 	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
+	body, _ := io.ReadAll(resp.Body)
 
 	var searchResponse MavenCentralSearchResponse
 	json.Unmarshal(body, &searchResponse)
@@ -257,7 +257,7 @@ func runCmd(command string, args ...string) {
 }
 
 func getFileContentAsString(path string) string {
-	fileContent, err := ioutil.ReadFile(path)
+	fileContent, err := os.ReadFile(path)
 
 	if err != nil {
 		panic(err)
