@@ -43,7 +43,7 @@ func main() {
 	updateGradleProperties("gradle.properties", currentProductName, latestProductName)
 	updateSettingsGradle("settings.gradle")
 	gradleBuildResultInMarkdown := runGradleAndGetResultInMarkdown(latestProductVersionName)
-	gitCommitAndPush(upgradeBranchName)
+	runCmd("git", "push", "-u", "origin", upgradeBranchName)
 
 	pullRequestTitle := "[Liferay Upgrade] To " + latestProductVersionName
 	pullRequestBody := gradleBuildResultInMarkdown
@@ -97,7 +97,11 @@ func updateGradleProperties(path, currentProductName, latestProductName string) 
 	if err != nil {
 		panic(err)
 	}
+
+	message := "build(liferay): bump product version to " + latestProductName
+	gitCommit(path, message)
 }
+
 func updateSettingsGradle(path string) {
 	versionRegex := regexp.MustCompile(`\d+.\d+.\d+`)
 	currentDependencyLine, err := getSettingsGradleWorkspaceDependencyLine()
@@ -138,6 +142,9 @@ func updateSettingsGradle(path string) {
 	if err != nil {
 		panic(err)
 	}
+
+	message := "build(liferay): bump workspace plugin version to " + latestVersion
+	gitCommit(path, message)
 }
 
 func getSettingsGradleWorkspaceDependencyLine() (string, error) {
@@ -191,9 +198,8 @@ func gitSwitchBranch(noUpgradeBranch bool, upgradeBranchName string) {
 	}
 }
 
-func gitCommitAndPush(upgradeBranchName string) {
-	runCmd("git", "add", "gradle.properties")
-	runCmd("git", "add", "settings.gradle")
+func gitCommit(filepath, message string) {
+	runCmd("git", "add", filepath)
 
 	cmd := exec.Command("git", "diff-index", "--quiet", "HEAD")
 	cmd.Stdout = os.Stdout
@@ -202,8 +208,7 @@ func gitCommitAndPush(upgradeBranchName string) {
 	err := cmd.Run()
 
 	if err != nil {
-		runCmd("git", "commit", "-m", "chore!: upgrade liferay workspace")
-		runCmd("git", "push", "-u", "origin", upgradeBranchName)
+		runCmd("git", "commit", "-m", message)
 	}
 }
 
