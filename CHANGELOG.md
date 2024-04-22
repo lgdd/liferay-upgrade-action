@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/lgdd/liferay-upgrade-action/compare/v2.1.1...v2.1.2) (2024-04-22)
+
+
+### Bug Fixes
+
+* workspace plugin upgrade when product is latest ([d57b8f6](https://github.com/lgdd/liferay-upgrade-action/commit/d57b8f6513c0242341d52aa48065c9f126603caf))
+
 ## [2.1.1](https://github.com/lgdd/liferay-upgrade-action/compare/v2.1.0...v2.1.1) (2024-04-15)
 
 
